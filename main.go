@@ -24,7 +24,10 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	//root
+	r := newRoom()
 	http.Handle("/", &TemplateHandler{fileName: "chat.html"})
+	http.Handle("/room", r)
+	go r.run()
 	//Inicia o web service
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
