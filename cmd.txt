@@ -1,1 +1,4 @@
 go get github.com/gorilla/websocket
+
+go build -o chat
+./chat -addr=":3000"
