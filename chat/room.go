@@ -8,28 +8,31 @@ import (
 	"github.com/matryer/goblueprints/chapter1/trace"
 )
 
+// room é uma estrutura que representa uma sala de chat.
 type room struct {
 
-	// forward is a channel that holds incoming messages
-	// that should be forwarded to the other clients.
+	// forward é um canal que contém as mensagens recebidas
+	//// que deve ser encaminhado para o outro clients.
 	forward chan []byte
 
-	// join is a channel for clients wishing to join the room.
+	// join é um canal para clients desejando ingressar na sala.
 	join chan *client
 
-	// leave is a channel for clients wishing to leave the room.
+	// leave é um canal para clients desejam sair da sala.
 	leave chan *client
 
-	// clients holds all current clients in this room.
+	// clients  é um mapa que armazena todos os clientes atuais na sala de chat.
 	clients map[*client]bool
 
-	// tracer will receive trace information of activity
-	// in the room.
+	// tracer receberá informações de rastreamento de atividade
+	// no room.
 	tracer trace.Tracer
 }
 
-// newRoom makes a new room that is ready to
-// go.
+// newRoom é uma função que cria uma nova instância de uma sala de chat e a retorna.
+// Ela inicializa os canais forward, join e leave.
+// Inicializa o mapa clients.
+// Define o rastreador como trace.Off(), que é um rastreador vazio (sem ação).
 func newRoom() *room {
 	return &room{
 		forward: make(chan []byte),
@@ -40,6 +43,13 @@ func newRoom() *room {
 	}
 }
 
+// run Ele implementa um loop infinito que aguarda mensagens de três canais: join, leave e forward.
+// Quando um cliente é recebido no canal join, ele é adicionado ao mapa clients
+// e uma mensagem de rastreamento é registrada.
+// Quando um cliente é recebido no canal leave, ele é removido do mapa clients,
+// o canal send do cliente é fechado e uma mensagem de rastreamento é registrada.
+// Quando uma mensagem é recebida no canal forward, ela é encaminhada para todos os clientes
+// /**/no mapa clients através do canal send de cada cliente, e uma mensagem de rastreamento é registrada.
 func (r *room) run() {
 	for {
 		select {

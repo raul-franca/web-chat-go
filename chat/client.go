@@ -4,19 +4,23 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// client represents a single chatting user.
+// client representa um único usuário do chat.
 type client struct {
 
-	// socket is the web socket for this client.
+	// socket é o socket da web para este cliente.
+	//é o objeto de conexão WebSocket para esse cliente.
 	socket *websocket.Conn
 
-	// send is a channel on which messages are sent.
+	// send é um canal no qual as mensagens são enviadas.
+	//é um canal em que as mensagens são enviadas do servidor para o cliente.
 	send chan []byte
 
-	// room is the room this client is chatting in.
+	// room é a sala em que este client está conversando.
 	room *room
 }
 
+// read é um método do cliente que lê continuamente as mensagens
+// recebidas do cliente através do WebSocket.
 func (c *client) read() {
 	defer c.socket.Close()
 	for {
@@ -28,6 +32,8 @@ func (c *client) read() {
 	}
 }
 
+// write  é um método do cliente que envia continuamente as mensagens
+// para o cliente através do WebSocket.
 func (c *client) write() {
 	defer c.socket.Close()
 	for msg := range c.send {

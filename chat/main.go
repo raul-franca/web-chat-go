@@ -12,24 +12,23 @@ import (
 	"github.com/matryer/goblueprints/chapter1/trace"
 )
 
-// templ represents a single template
+// templateHandler representa um único template
 type templateHandler struct {
 	once     sync.Once
 	filename string
 	templ    *template.Template
 }
 
-// ServeHTTP handles the HTTP request.
+// ServeHTTP lida com a requisição HTTP.
 func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
 	t.templ.Execute(w, r)
 }
-
 func main() {
 	var addr = flag.String("addr", ":8080", "The addr of the application.")
-	flag.Parse() // parse the flags
+	flag.Parse() // analisa as flags
 
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
@@ -37,13 +36,12 @@ func main() {
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
 
-	// get the room going
+	// inicia a sala de chat
 	go r.run()
 
-	// start the web server
+	// inicia o servidor web
 	log.Println("Starting web server on", *addr)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
-
 }
